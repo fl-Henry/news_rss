@@ -4,41 +4,73 @@ const puppeteer = require('puppeteer');
 const gm = require('./general_methods/gm');
 
 
+class PupWrp {
 
-if (process.argv[2] && process.argv[2] === '--url' && process.argv[3]) {
-    URL = process.argv[3]
-} else {
-    console.log(process.argv)
-    console.log('Required --url');
-    process.exit(1)
-}
+    url;
+    browser;
+    page;
 
+    constructor(url) {
+        this.url = url;
+    }
 
-(async () => {
-    const browser = await puppeteer.launch({
-        headless: 'new',
-    });
-    try {
-        const page = await browser.newPage();
-        await page.setViewport({
-            width: 1920,
-            height: 1080,
+    async startBrowser(headless_ = true, proxy = null, width_px = 1920, height_px = 1080) {
+        let args = {};
+        args['args'] = [];
+
+        if (headless_) {
+            args['headless'] = 'new';
+        }
+        else {
+            args['headless'] = false;
+        } 
+
+        if (proxy !== null) {
+            args['args'].push(`--proxy-server=${proxy}`)
+        }
+
+        this.browser = await puppeteer.launch(args);    
+        
+        this.page = await this.browser.newPage();
+        await this.page.setViewport({
+            width: width_px,
+            height: height_px,
             deviceScaleFactor: 1,
         });
 
-        await page.goto(URL,
+        // disable images
+        await this.page.setRequestInterception(true);
+        this.page.on('request', (req) => {
+            if(req.resourceType() == 'stylesheet' || req.resourceType() == 'font' || req.resourceType() == 'image'){
+                req.abort();
+            }
+            else {
+                req.continue();
+            }
+        });
+    }
+
+    async close() {
+        await this.browser.close();
+    }
+
+    async loadPage(waitUntil_val = "load") {
+        console.log("load: " + this.url)
+        await this.page.goto(this.url,
             {
                 timeout: 60000,
-                waitUntil: 'networkidle0'
+                waitUntil: waitUntil_val
             }
         )
-
-        const html = await page.content();
-        gm.writeFile("result_common_rendered.txt", html)
-        await page.screenshot({ path: 'hello_world.png'});
-    } catch (e) {
-        console.error(e);
-    } finally {
-        await browser.close();
     }
-})();
+
+    async saveHtml(filePath) {
+        const html = await this.page.content();
+        gm.writeFile(filePath, html)
+    }
+}
+
+module.exports = {
+   PupWrp,
+}
+

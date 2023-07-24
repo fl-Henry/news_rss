@@ -18,9 +18,13 @@ def get_headers():
     return Headers(os=random_os, browser=random_browser, headers=True).generate()
 
 
-def get_response_text(url):
-    return requests.get(url, headers=get_headers()).text
-
+def get_response_text(url, params=None):
+    if params is None:
+        return requests.get(url, headers=get_headers()).text
+    else:
+        r = requests.get(url, headers=get_headers(), params=params)
+        return r.text
+        
 
 def get_soup(text):
     return BeautifulSoup(str(text), "lxml")

@@ -244,3 +244,9 @@ def text_rewrite(filepath, text_data=None):
 
     except Exception as _ex:
         gm.PrintMode.error("Not saved:", _ex)
+
+
+def text_read(filepath):
+    with open(filepath, "r") as file:
+        text_data = file.read()
+        return text_data

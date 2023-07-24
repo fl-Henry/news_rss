@@ -9,6 +9,8 @@ from datetime import datetime, timedelta, date
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
+EMPTY = ['', " ", "\n", "\r", None]
+
 # # ===== General Methods ======================================================================= General Methods =====
 ...
 # # ===== General Methods ======================================================================= General Methods =====

@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/fl-Henry/news_rss/issues"
   },
-  "homepage": "https://github.com/fl-Henry/news_rss#readme"
+  "homepage": "https://github.com/fl-Henry/news_rss#readme",
+  "dependencies": {
+    "puppeteer": "^20.8.2"
+  }
 }
